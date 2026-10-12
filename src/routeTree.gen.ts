@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as R5gSaRouteImport } from './routes/5g-sa'
+import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as LteRouteImport } from './routes/lte'
+import { Route as TimelineRouteImport } from './routes/timeline'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R5gSaRoute = R5gSaRouteImport.update({
+  id: '/5g-sa',
+  path: '/5g-sa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExplorerRoute = ExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LteRoute = LteRouteImport.update({
+  id: '/lte',
+  path: '/lte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/5g-sa': typeof R5gSaRoute
+  '/explorer': typeof ExplorerRoute
+  '/lte': typeof LteRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/5g-sa': typeof R5gSaRoute
+  '/explorer': typeof ExplorerRoute
+  '/lte': typeof LteRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/5g-sa': typeof R5gSaRoute
+  '/explorer': typeof ExplorerRoute
+  '/lte': typeof LteRoute
+  '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/5g-sa' | '/explorer' | '/lte' | '/timeline'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/5g-sa' | '/explorer' | '/lte' | '/timeline'
+  id: '__root__' | '/' | '/5g-sa' | '/explorer' | '/lte' | '/timeline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R5gSaRoute: typeof R5gSaRoute
+  ExplorerRoute: typeof ExplorerRoute
+  LteRoute: typeof LteRoute
+  TimelineRoute: typeof TimelineRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/5g-sa': {
+      id: '/5g-sa'
+      path: '/5g-sa'
+      fullPath: '/5g-sa'
+      preLoaderRoute: typeof R5gSaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lte': {
+      id: '/lte'
+      path: '/lte'
+      fullPath: '/lte'
+      preLoaderRoute: typeof LteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R5gSaRoute: R5gSaRoute,
+  ExplorerRoute: ExplorerRoute,
+  LteRoute: LteRoute,
+  TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
