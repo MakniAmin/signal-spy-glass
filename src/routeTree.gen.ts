@@ -10,33 +10,154 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as R5gSaRouteImport } from './routes/5g-sa'
+import { Route as ArchitectureRouteImport } from './routes/architecture'
+import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as GlossaryRouteImport } from './routes/glossary'
+import { Route as ImportRouteImport } from './routes/import'
+import { Route as LteRouteImport } from './routes/lte'
+import { Route as PfcpRouteImport } from './routes/pfcp'
+import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as TroubleshootingRouteImport } from './routes/troubleshooting'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const R5gSaRoute = R5gSaRouteImport.update({
+  id: '/5g-sa',
+  path: '/5g-sa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchitectureRoute = ArchitectureRouteImport.update({
+  id: '/architecture',
+  path: '/architecture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExplorerRoute = ExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GlossaryRoute = GlossaryRouteImport.update({
+  id: '/glossary',
+  path: '/glossary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImportRoute = ImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LteRoute = LteRouteImport.update({
+  id: '/lte',
+  path: '/lte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PfcpRoute = PfcpRouteImport.update({
+  id: '/pfcp',
+  path: '/pfcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TroubleshootingRoute = TroubleshootingRouteImport.update({
+  id: '/troubleshooting',
+  path: '/troubleshooting',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/5g-sa': typeof R5gSaRoute
+  '/architecture': typeof ArchitectureRoute
+  '/explorer': typeof ExplorerRoute
+  '/glossary': typeof GlossaryRoute
+  '/import': typeof ImportRoute
+  '/lte': typeof LteRoute
+  '/pfcp': typeof PfcpRoute
+  '/timeline': typeof TimelineRoute
+  '/troubleshooting': typeof TroubleshootingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/5g-sa': typeof R5gSaRoute
+  '/architecture': typeof ArchitectureRoute
+  '/explorer': typeof ExplorerRoute
+  '/glossary': typeof GlossaryRoute
+  '/import': typeof ImportRoute
+  '/lte': typeof LteRoute
+  '/pfcp': typeof PfcpRoute
+  '/timeline': typeof TimelineRoute
+  '/troubleshooting': typeof TroubleshootingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/5g-sa': typeof R5gSaRoute
+  '/architecture': typeof ArchitectureRoute
+  '/explorer': typeof ExplorerRoute
+  '/glossary': typeof GlossaryRoute
+  '/import': typeof ImportRoute
+  '/lte': typeof LteRoute
+  '/pfcp': typeof PfcpRoute
+  '/timeline': typeof TimelineRoute
+  '/troubleshooting': typeof TroubleshootingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/5g-sa'
+    | '/architecture'
+    | '/explorer'
+    | '/glossary'
+    | '/import'
+    | '/lte'
+    | '/pfcp'
+    | '/timeline'
+    | '/troubleshooting'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/5g-sa'
+    | '/architecture'
+    | '/explorer'
+    | '/glossary'
+    | '/import'
+    | '/lte'
+    | '/pfcp'
+    | '/timeline'
+    | '/troubleshooting'
+  id:
+    | '__root__'
+    | '/'
+    | '/5g-sa'
+    | '/architecture'
+    | '/explorer'
+    | '/glossary'
+    | '/import'
+    | '/lte'
+    | '/pfcp'
+    | '/timeline'
+    | '/troubleshooting'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R5gSaRoute: typeof R5gSaRoute
+  ArchitectureRoute: typeof ArchitectureRoute
+  ExplorerRoute: typeof ExplorerRoute
+  GlossaryRoute: typeof GlossaryRoute
+  ImportRoute: typeof ImportRoute
+  LteRoute: typeof LteRoute
+  PfcpRoute: typeof PfcpRoute
+  TimelineRoute: typeof TimelineRoute
+  TroubleshootingRoute: typeof TroubleshootingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/5g-sa': {
+      id: '/5g-sa'
+      path: '/5g-sa'
+      fullPath: '/5g-sa'
+      preLoaderRoute: typeof R5gSaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/architecture': {
+      id: '/architecture'
+      path: '/architecture'
+      fullPath: '/architecture'
+      preLoaderRoute: typeof ArchitectureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/glossary': {
+      id: '/glossary'
+      path: '/glossary'
+      fullPath: '/glossary'
+      preLoaderRoute: typeof GlossaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/import': {
+      id: '/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof ImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lte': {
+      id: '/lte'
+      path: '/lte'
+      fullPath: '/lte'
+      preLoaderRoute: typeof LteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pfcp': {
+      id: '/pfcp'
+      path: '/pfcp'
+      fullPath: '/pfcp'
+      preLoaderRoute: typeof PfcpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/troubleshooting': {
+      id: '/troubleshooting'
+      path: '/troubleshooting'
+      fullPath: '/troubleshooting'
+      preLoaderRoute: typeof TroubleshootingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R5gSaRoute: R5gSaRoute,
+  ArchitectureRoute: ArchitectureRoute,
+  ExplorerRoute: ExplorerRoute,
+  GlossaryRoute: GlossaryRoute,
+  ImportRoute: ImportRoute,
+  LteRoute: LteRoute,
+  PfcpRoute: PfcpRoute,
+  TimelineRoute: TimelineRoute,
+  TroubleshootingRoute: TroubleshootingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
