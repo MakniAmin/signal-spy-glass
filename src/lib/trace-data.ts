@@ -80,8 +80,8 @@ interface Raw {
 function build(scenario: Scenario, raws: Raw[]): Packet[] {
   return raws.map((r, i) => {
     const tp = transport[r.proto] ?? { l4: "UDP", port: 0 };
-    const srcIp = NODES[r.s].ip.split(" ")[0];
-    const dstIp = NODES[r.d].ip.split(" ")[0];
+    const srcIp = NODES[r.s]!.ip.split(" ")[0]!;
+    const dstIp = NODES[r.d]!.ip.split(" ")[0]!;
     const length = 90 + ((JSON.stringify(r.fields).length * 7) % 260);
     const tree: DecodeNode[] = [
       { label: `Frame ${i + 1}`, value: `${length} bytes (illustrative)`, children: toTree({ "Relative time": `${r.t.toFixed(6)} s`, Interface: r.iface, Plane: r.plane ?? "control" }) },

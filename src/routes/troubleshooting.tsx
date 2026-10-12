@@ -54,7 +54,7 @@ const Sect = ({ t, items, mono }: { t: string; items: string[]; mono?: boolean }
 );
 
 function Page() {
-  const [id, setId] = useState(CASES[0].id);
+  const [id, setId] = useState(CASES[0]!.id);
   const c = CASES.find((x) => x.id === id)!;
   return (
     <>

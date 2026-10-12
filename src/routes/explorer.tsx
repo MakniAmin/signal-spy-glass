@@ -10,7 +10,7 @@ type Search = { scenario?: Scenario | "all" };
 
 export const Route = createFileRoute("/explorer")({
   validateSearch: (s: Record<string, unknown>): Search => {
-    const v = s.scenario;
+    const v = s["scenario"];
     return v === "lte" || v === "5gsa" || v === "imported" || v === "all" ? { scenario: v } : {};
   },
   head: () => meta("Trace Explorer", "Wireshark-inspired packet list with search, protocol and scenario filters and a decode-tree detail pane."),
@@ -58,7 +58,7 @@ function Explorer() {
         </label>
         <label className="flex flex-col gap-1 text-xs text-muted-foreground">
           Scenario
-          <select value={scenario} onChange={(e) => navigate({ search: { scenario: e.target.value as Search["scenario"] } })} className={`${sel} text-foreground`}>
+          <select value={scenario} onChange={(e) => navigate({ search: { scenario: e.target.value as Scenario | "all" } })} className={`${sel} text-foreground`}>
             <option value="all">All scenarios</option>
             {(Object.keys(SCENARIO_LABEL) as Scenario[]).map((s) => <option key={s} value={s}>{SCENARIO_LABEL[s]}</option>)}
           </select>

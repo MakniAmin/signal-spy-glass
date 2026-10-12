@@ -54,7 +54,7 @@ function Index() {
           <h2 className="eyebrow mb-3">Supported protocols (in sample traces)</h2>
           <table className="w-full text-sm">
             <tbody>
-              {PROTOS.map(([p, gen, d]) => (
+              {PROTOS.map(([p = "", gen, d]) => (
                 <tr key={p} className="border-b border-border/50 last:border-0">
                   <td className="py-1.5 pr-3"><ProtoTag p={p} /></td>
                   <td className="py-1.5 pr-3 font-mono text-xs text-muted-foreground">{gen}</td>

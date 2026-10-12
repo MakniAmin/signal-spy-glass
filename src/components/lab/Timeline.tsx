@@ -47,7 +47,7 @@ export function Timeline({ packets, nodes, selectedId, onSelect }: { packets: Pa
                   >
                     <span className="font-mono text-muted-foreground">#{p.no}</span>
                     <ProtoTag p={p.protocol} />
-                    <span className={cn("max-w-[22rem] truncate", sel ? "text-foreground" : "text-foreground/85")}>{p.info.split(",").slice(-1)[0].trim()}</span>
+                    <span className={cn("max-w-[22rem] truncate", sel ? "text-foreground" : "text-foreground/85")}>{(p.info.split(",").pop() ?? "").trim()}</span>
                   </span>
                   <span
                     aria-hidden
