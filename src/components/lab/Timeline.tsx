@@ -43,7 +43,7 @@ export function Timeline({ packets, nodes, selectedId, onSelect }: { packets: Pa
                   ))}
                   <span
                     className="absolute top-1 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap text-[11px]"
-                    style={{ left: `${(left + right) / 2}%` }}
+                    style={{ left: `${Math.min(Math.max((left + right) / 2, 24), 68)}%` }}
                   >
                     <span className="font-mono text-muted-foreground">#{p.no}</span>
                     <ProtoTag p={p.protocol} />
