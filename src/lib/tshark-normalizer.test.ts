@@ -78,6 +78,49 @@ describe("normalizeTsharkJson", () => {
     });
   });
 
+
+it("detects GTP-U from real TShark JSON without Wireshark column fields", () => {
+  const packet = [
+    {
+      _source: {
+        layers: {
+          frame: {
+            "frame.time_relative": "0.000000000",
+            "frame.len": "142",
+            "frame.protocols": "eth:ethertype:ip:udp:gtp:ip:icmp:data",
+          },
+          ip: {
+            "ip.src": "192.168.100.3",
+            "ip.dst": "8.8.8.8",
+          },
+          udp: {
+            "udp.srcport": "2152",
+            "udp.dstport": "2152",
+          },
+          gtp: {
+            "gtp.message": "0xff",
+            "gtp.length": "92",
+            "gtp.teid": "0x0000b7f6",
+          },
+          icmp: {
+            "icmp.type": "8",
+          },
+        },
+      },
+    },
+  ];
+
+  expect(normalizeTsharkJson(packet)[0]).toMatchObject({
+    time: 0,
+    src: "192.168.100.3",
+    dst: "8.8.8.8",
+    protocol: "GTP-U",
+    length: 142,
+    info: "GTP-U G-PDU, TEID=0x0000b7f6, ICMP Echo Request",
+  });
+});
+
+
   it("rejects non-array input, empty captures, and malformed packets", () => {
     expect(() => normalizeTsharkJson({})).toThrow(/packet array/);
     expect(() => normalizeTsharkJson([])).toThrow(/no packets/);

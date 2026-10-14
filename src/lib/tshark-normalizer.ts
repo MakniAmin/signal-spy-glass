@@ -116,12 +116,79 @@ export function normalizeTsharkJson(input: unknown): NormalizedTraceRecord[] {
 
     const src = scalarText(findField(layers, "ip.src")) ?? scalarText(findField(layers, "ipv6.src")) ?? scalarText(findField(layers, "arp.src.proto_ipv4")) ?? "Unknown";
     const dst = scalarText(findField(layers, "ip.dst")) ?? scalarText(findField(layers, "ipv6.dst")) ?? scalarText(findField(layers, "arp.dst.proto_ipv4")) ?? "Unknown";
-    const reportedProtocol = scalarText(findField(layers, "_ws.col.Protocol")) ?? "Unknown";
-    const info = scalarText(findField(layers, "_ws.col.Info")) ?? reportedProtocol;
-    const gtpMessage = scalarText(findField(layers, "gtp.message")) ?? "";
-    // Wireshark often labels both GTP-C and GTP-U simply "GTP". Detect T-PDU for user-plane classification.
-    const protocol = /t-pdu/i.test(gtpMessage) || /t-pdu/i.test(info) ? "GTP-U" : reportedProtocol;
 
+    const reportedProtocol = scalarText(
+  findField(layers, "_ws.col.Protocol"),
+);
+const reportedInfo = scalarText(
+  findField(layers, "_ws.col.Info"),
+);
+const frameProtocols =
+  scalarText(findField(layers, "frame.protocols")) ?? "";
+
+const gtpMessage =
+  scalarText(findField(layers, "gtp.message")) ?? "";
+
+const normalizedGtpMessage = gtpMessage.trim().toLowerCase();
+
+const isGtpUserPlane =
+  ["0xff", "255", "g-pdu", "t-pdu"].includes(
+    normalizedGtpMessage,
+  );
+
+const protocolStack = frameProtocols
+  .split(":")
+  .filter(Boolean);
+
+const protocolLabels: Record<string, string> = {
+  diameter: "Diameter",
+  gtp: "GTP",
+  pfcp: "PFCP",
+  ngap: "NGAP",
+  s1ap: "S1AP",
+  http2: "HTTP/2",
+  http: "HTTP",
+  icmp: "ICMP",
+  icmpv6: "ICMPv6",
+  tcp: "TCP",
+  udp: "UDP",
+  dns: "DNS",
+  tls: "TLS",
+};
+
+const detectedProtocol =
+  protocolStack
+    .slice()
+    .reverse()
+    .map((layer) => protocolLabels[layer.toLowerCase()])
+    .find(Boolean) ?? "Unknown";
+
+const protocol = isGtpUserPlane
+  ? "GTP-U"
+  : reportedProtocol ?? detectedProtocol;
+
+const teid = scalarText(findField(layers, "gtp.teid"));
+const icmpType = scalarText(findField(layers, "icmp.type"));
+
+let generatedInfo = "";
+
+if (isGtpUserPlane) {
+  const details = ["GTP-U G-PDU"];
+
+  if (teid) {
+    details.push(`TEID=${teid}`);
+  }
+
+  if (icmpType === "8") {
+    details.push("ICMP Echo Request");
+  } else if (icmpType === "0") {
+    details.push("ICMP Echo Reply");
+  }
+
+  generatedInfo = details.join(", ");
+}
+
+const info = reportedInfo ?? (generatedInfo || protocol);
     return {
       time,
       src,
