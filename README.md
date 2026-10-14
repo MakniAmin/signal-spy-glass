@@ -44,3 +44,17 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Real capture workflow
+
+The workbench accepts either its normalized JSON record format or raw JSON exported by TShark. Binary PCAP/PCAPNG decoding is **not** performed in the browser: use Wireshark/TShark locally, then import the JSON output.
+
+Example (up to 5,000 packets):
+
+```sh
+tshark -r lab.pcapng -c 5000 -Y "ngap || pfcp || gtp || gtpv2 || s1ap" -T json > lab.tshark.json
+```
+
+Open **Import Trace** and select `lab.tshark.json`. The importer extracts relative time, endpoints, protocol, frame length, packet summary and available decoded protocol fields. It supports IPv4/IPv6 endpoint fields and the workbench's 5 MB file limit. Captures without `frame.time_relative` are rejected rather than assigning invented timestamps.
+
+The parser is intentionally a normalizer, not a full Wireshark decoder. Decoded fields depend on the TShark version, enabled dissectors, capture contents and display filter. Verify important protocol interpretations against Wireshark before using them as troubleshooting evidence. Treat captures as sensitive: imported packet details remain in browser storage, and reset the workbench when finished on a shared machine.
