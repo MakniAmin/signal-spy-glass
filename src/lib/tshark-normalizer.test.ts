@@ -43,6 +43,10 @@ describe("normalizeTsharkJson", () => {
         length: 112,
         info: "T-PDU, TEID=0x00000101",
         fields: {
+          udp: {
+            "udp.srcport": "2152",
+            "udp.dstport": "2152",
+          },
           gtp: {
             "gtp.message": "T-PDU",
             "gtp.teid": "0x00000101",
