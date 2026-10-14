@@ -116,8 +116,8 @@ function Page() {
       </div>
       <section className="panel mt-4 p-4 text-sm">
         <h2 className="eyebrow mb-2">Export from tshark (example)</h2>
-        <pre className="overflow-x-auto rounded bg-background/60 p-3 font-mono text-xs text-primary">{`tshark -r lab.pcapng -Y "ngap || pfcp || gtp" -T fields \\\
-  -e frame.time_relative -e ip.src -e ip.dst -e _ws.col.Protocol \\\
+        <pre className="overflow-x-auto rounded bg-background/60 p-3 font-mono text-xs text-primary">{`tshark -r lab.pcapng -Y "ngap || pfcp || gtp" -T fields \\
+  -e frame.time_relative -e ip.src -e ip.dst -e _ws.col.Protocol \\
   -e frame.len -e _ws.col.Info -E separator=, -E quote=d > lab.csv
 # then convert CSV rows to the JSON array above (e.g. a small Python script)`}</pre>
       </section>
