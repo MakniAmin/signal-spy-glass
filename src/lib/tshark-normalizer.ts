@@ -117,8 +117,11 @@ export function normalizeTsharkJson(input: unknown): NormalizedTraceRecord[] {
 
     const src = scalarText(findField(layers, "ip.src")) ?? scalarText(findField(layers, "ipv6.src")) ?? scalarText(findField(layers, "arp.src.proto_ipv4")) ?? "Unknown";
     const dst = scalarText(findField(layers, "ip.dst")) ?? scalarText(findField(layers, "ipv6.dst")) ?? scalarText(findField(layers, "arp.dst.proto_ipv4")) ?? "Unknown";
-    const protocol = scalarText(findField(layers, "_ws.col.Protocol")) ?? "Unknown";
-    const info = scalarText(findField(layers, "_ws.col.Info")) ?? protocol;
+    const reportedProtocol = scalarText(findField(layers, "_ws.col.Protocol")) ?? "Unknown";
+    const info = scalarText(findField(layers, "_ws.col.Info")) ?? reportedProtocol;
+    const gtpMessage = scalarText(findField(layers, "gtp.message")) ?? "";
+    // Wireshark often labels both GTP-C and GTP-U simply "GTP". Detect T-PDU for user-plane classification.
+    const protocol = /t-pdu/i.test(gtpMessage) || /t-pdu/i.test(info) ? "GTP-U" : reportedProtocol;
 
     return {
       time,
