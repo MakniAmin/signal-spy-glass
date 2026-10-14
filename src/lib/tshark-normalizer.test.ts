@@ -39,7 +39,7 @@ describe("normalizeTsharkJson", () => {
         time: 0.125,
         src: "192.0.2.10",
         dst: "192.0.2.20",
-        protocol: "GTP",
+        protocol: "GTP-U",
         length: 112,
         info: "T-PDU, TEID=0x00000101",
         fields: {
