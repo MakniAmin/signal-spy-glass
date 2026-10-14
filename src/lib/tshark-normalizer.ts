@@ -163,12 +163,55 @@ const detectedProtocol =
     .map((layer) => protocolLabels[layer.toLowerCase()])
     .find(Boolean) ?? "Unknown";
 
+
+const PFCP_MESSAGE_TYPES: Record<string, string> = {
+  "0": "Reserved",
+  "1": "Heartbeat Request",
+  "2": "Heartbeat Response",
+  "3": "PFD Management Request",
+  "4": "PFD Management Response",
+  "5": "Association Setup Request",
+  "6": "Association Setup Response",
+  "7": "Association Update Request",
+  "8": "Association Update Response",
+  "9": "Association Release Request",
+  "10": "Association Release Response",
+  "11": "Version Not Supported Response",
+  "12": "Node Report Request",
+  "13": "Node Report Response",
+  "14": "Session Set Deletion Request",
+  "15": "Session Set Deletion Response",
+  "16": "Session Set Modification Request",
+  "17": "Session Set Modification Response",
+  "50": "Session Establishment Request",
+  "51": "Session Establishment Response",
+  "52": "Session Modification Request",
+  "53": "Session Modification Response",
+  "54": "Session Deletion Request",
+  "55": "Session Deletion Response",
+  "56": "Session Report Request",
+  "57": "Session Report Response",
+};
+
+
+const pfcpMessageType = scalarText(findField(layers, "pfcp.msg_type"));
+const isPfcp =
+  protocolStack.some((layer) => layer.toLowerCase() === "pfcp") ||
+  pfcpMessageType !== undefined;
+
 const protocol = isGtpUserPlane
   ? "GTP-U"
-  : reportedProtocol ?? detectedProtocol;
+  : isPfcp
+    ? "PFCP"
+    : reportedProtocol ?? detectedProtocol;
+
 
 const teid = scalarText(findField(layers, "gtp.teid"));
 const icmpType = scalarText(findField(layers, "icmp.type"));
+
+const pfcpSequence = scalarText(findField(layers, "pfcp.seqno"));
+const pfcpSeid = scalarText(findField(layers, "pfcp.seid"));
+const pfcpCause = scalarText(findField(layers, "pfcp.cause"));
 
 let generatedInfo = "";
 
@@ -186,9 +229,32 @@ if (isGtpUserPlane) {
   }
 
   generatedInfo = details.join(", ");
+} else if (isPfcp) {
+  const messageType = pfcpMessageType
+    ? PFCP_MESSAGE_TYPES[pfcpMessageType] ??
+      `Message Type ${pfcpMessageType}`
+    : undefined;
+
+  const details = [messageType ?? "PFCP Message"];
+
+  if (pfcpSeid) {
+    details.push(`SEID=${pfcpSeid}`);
+  }
+
+  if (pfcpSequence) {
+    details.push(`Sequence=${pfcpSequence}`);
+  }
+
+  if (pfcpCause) {
+    details.push(`Cause=${pfcpCause}`);
+  }
+
+  generatedInfo = details.join(", ");
 }
 
 const info = reportedInfo ?? (generatedInfo || protocol);
+
+
     return {
       time,
       src,

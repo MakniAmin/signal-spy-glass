@@ -33,6 +33,123 @@ const sample = [
 ];
 
 describe("normalizeTsharkJson", () => {
+
+  it("recognizes PFCP and extracts message type, SEID, and sequence number", () => {
+    const packet = [
+      {
+        _source: {
+          layers: {
+            frame: {
+              "frame.time_relative": "2.5",
+              "frame.len": "84",
+              "frame.protocols": "eth:ethertype:ip:udp:pfcp",
+            },
+            ip: {
+              "ip.src": "192.0.2.10",
+              "ip.dst": "192.0.2.20",
+            },
+            udp: {
+              "udp.srcport": "8805",
+              "udp.dstport": "8805",
+            },
+            pfcp: {
+              "pfcp.msg_type": "50",
+              "pfcp.seid": "0x0000000000001234",
+              "pfcp.seqno": "123",
+            },
+          },
+        },
+      },
+    ];
+
+    expect(normalizeTsharkJson(packet)[0]).toMatchObject({
+      time: 2.5,
+      src: "192.0.2.10",
+      dst: "192.0.2.20",
+      protocol: "PFCP",
+      length: 84,
+      info:
+        "Session Establishment Request, SEID=0x0000000000001234, Sequence=123",
+    });
+  });
+
+  it("recognizes PFCP from its message type when the protocol stack is absent", () => {
+    const packet = [
+      {
+        _source: {
+          layers: {
+            frame: {
+              "frame.time_relative": "3.0",
+              "frame.len": "64",
+            },
+            pfcp: {
+              "pfcp.msg_type": "52",
+              "pfcp.seqno": "7",
+            },
+          },
+        },
+      },
+    ];
+
+    expect(normalizeTsharkJson(packet)[0]).toMatchObject({
+      protocol: "PFCP",
+      info: "Session Modification Request, Sequence=7",
+    });
+  });
+
+  it("handles PFCP packets with missing optional fields", () => {
+    const packet = [
+      {
+        _source: {
+          layers: {
+            frame: {
+              "frame.time_relative": "4.0",
+              "frame.len": "60",
+              "frame.protocols": "eth:ip:udp:pfcp",
+            },
+            pfcp: {
+              "pfcp.msg_type": "51",
+            },
+          },
+        },
+      },
+    ];
+
+    expect(normalizeTsharkJson(packet)[0]).toMatchObject({
+      protocol: "PFCP",
+      info: "Session Establishment Response",
+    });
+  });
+
+  it("uses the reported Wireshark Info column when available for PFCP", () => {
+    const packet = [
+      {
+        _source: {
+          layers: {
+            frame: {
+              "frame.time_relative": "5.0",
+              "frame.len": "72",
+              "frame.protocols": "eth:ip:udp:pfcp",
+            },
+            pfcp: {
+              "pfcp.msg_type": "50",
+              "pfcp.seqno": "9",
+            },
+            "_ws.col": {
+              "_ws.col.Protocol": "PFCP",
+              "_ws.col.Info": "Session Establishment Request",
+            },
+          },
+        },
+      },
+    ];
+
+    expect(normalizeTsharkJson(packet)[0]).toMatchObject({
+      protocol: "PFCP",
+      info: "Session Establishment Request",
+    });
+  });
+
   it("normalizes common TShark JSON packet fields", () => {
     expect(normalizeTsharkJson(sample)).toEqual([
       {
