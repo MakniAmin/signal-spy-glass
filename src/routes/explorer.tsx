@@ -42,7 +42,7 @@ function Explorer() {
   return (
     <>
       <PageHeader eyebrow="Trace Explorer" title="Packet list">
-        Click a row or use ↑/↓ to step through packets. Search matches info, addresses, node names and interfaces.
+        Click a row or use ↑/↓ to step through packets. Search matches info, addresses, node names and interfaces. Demo frame lengths are illustrative; imported lengths come from the source records.
       </PageHeader>
       <div className="mb-3 flex flex-wrap items-end gap-2">
         <label className="flex flex-col gap-1 text-xs text-muted-foreground">

@@ -1,5 +1,5 @@
 // Hand-authored TEACHING traces. Not real captures, not standards-validated.
-// All addresses use RFC 5737 documentation ranges; identifiers use test PLMN 001/01.
+// Core-node addresses use RFC 5737 documentation ranges; the illustrative UE address 10.45.0.7 is private RFC 1918 space. Identifiers use test PLMN 001/01.
 
 export type Scenario = "lte" | "5gsa" | "imported";
 export type Plane = "control" | "user";

@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/lab/bits";
 import { useTrace } from "@/lib/trace-store";
 import { toTree, type Packet } from "@/lib/trace-data";
 import { meta } from "@/lib/meta";
+import { normalizeTsharkJson } from "@/lib/tshark-normalizer";
 
 export const Route = createFileRoute("/import")({
   head: () => meta("Import Trace", "Import normalized JSON packet records exported from Wireshark/tshark into the workbench."),
@@ -16,7 +17,7 @@ type F = { [k: string]: z.infer<typeof scalar> | F };
 const fieldsSchema: z.ZodType<F> = z.lazy(() => z.record(z.union([scalar, fieldsSchema])));
 
 const recordSchema = z.object({
-  time: z.number().nonnegative(),
+  time: z.number().finite().nonnegative(),
   src: z.string().trim().min(1).max(100),
   dst: z.string().trim().min(1).max(100),
   protocol: z.string().trim().min(1).max(30),
@@ -45,17 +46,31 @@ const EXAMPLE = `[
 ]`;
 
 function Page() {
-  const { setImported, imported, resetToDemo } = useTrace();
+  const { setImported, imported, resetToDemo, persistenceError } = useTrace();
   const [errors, setErrors] = useState<string[]>([]);
   const [ok, setOk] = useState<string | null>(null);
 
   const handle = async (file: File) => {
-    setErrors([]); setOk(null);
+    setErrors([]);
+    setOk(null);
     if (file.size > 5_000_000) return setErrors(["File is larger than 5 MB."]);
     if (/\.(pcap|pcapng|cap)$/i.test(file.name)) return setErrors(["PCAP/PCAPNG files are not decoded here. Decode in Wireshark/tshark and export normalized JSON (see below)."]);
     let data: unknown;
-    try { data = JSON.parse(await file.text()); } catch { return setErrors(["File is not valid JSON."]); }
-    const r = fileSchema.safeParse(data);
+    try {
+      data = JSON.parse(await file.text());
+    } catch {
+      return setErrors(["File is not valid JSON."]);
+    }
+    const isTsharkJson = Array.isArray(data) && data.some((item) => typeof item === "object" && item !== null && "_source" in item);
+    let candidate: unknown = data;
+    if (isTsharkJson) {
+      try {
+        candidate = normalizeTsharkJson(data);
+      } catch (error) {
+        return setErrors([error instanceof Error ? error.message : "Could not normalize TShark JSON."]);
+      }
+    }
+    const r = fileSchema.safeParse(candidate);
     if (!r.success) return setErrors(r.error.issues.slice(0, 12).map((i) => `${i.path.length ? `[${i.path.join(".")}] ` : ""}${i.message}`));
     const pkts: Packet[] = r.data.map((d, i) => ({
       id: `imported-${i + 1}`, no: i + 1, time: d.time, src: d.src, dst: d.dst,
@@ -65,21 +80,27 @@ function Page() {
       tree: d.fields ? toTree({ [d.protocol]: d.fields as never }) : [{ label: d.protocol, value: d.info }], demo: false,
     }));
     setImported(pkts);
-    setOk(`Imported ${pkts.length} records from ${file.name}.`);
+    setOk(`Imported ${pkts.length} records${isTsharkJson ? " (normalized from TShark JSON)" : ""} from ${file.name}.`);
   };
 
   return (
     <>
       <PageHeader eyebrow="Import Trace" title="Bring your own normalized records" badge={false}>
-        This workbench does <strong>not</strong> parse PCAP/PCAPNG. Decode captures in Wireshark or tshark, export selected fields, and normalize them
-        to the JSON shape below. Data stays in your browser (local storage) and is never uploaded.
+        This workbench does <strong>not</strong> parse binary PCAP/PCAPNG files in the browser. It accepts normalized JSON records or TShark's
+        <code className="mx-1">-T json</code> output directly (up to 5,000 packets / 5 MB). Data stays in your browser (local storage) and is never uploaded.
       </PageHeader>
+      {persistenceError && (
+        <div role="status" className="panel mb-4 border border-warn/50 p-3 text-sm">
+          <p className="font-semibold">Browser storage notice</p>
+          <p className="mt-1 text-muted-foreground">{persistenceError}</p>
+        </div>
+      )}
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="panel p-4">
           <label className="block rounded-md border border-dashed border-input p-6 text-center hover:border-primary">
             <span className="text-sm">Choose a <span className="font-mono">.json</span> file</span>
             <input type="file" accept=".json,application/json,.pcap,.pcapng" className="mt-3 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-primary file:px-3 file:py-1 file:text-primary-foreground"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handle(f); e.target.value = ""; }} />
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) void handle(f); e.target.value = ""; }} />
           </label>
           {errors.length > 0 && (
             <div role="alert" className="mt-3 rounded border border-destructive/50 bg-destructive/10 p-3 text-sm">
@@ -99,7 +120,7 @@ function Page() {
         </section>
         <section className="panel p-4">
           <h2 className="eyebrow mb-2">Expected shape</h2>
-          <p className="mb-2 text-sm text-muted-foreground">Required: time, src, dst, protocol, info. Optional: length, srcNode, dstNode, step, explain, fields (nested object → decode tree).</p>
+          <p className="mb-2 text-sm text-muted-foreground">Normalized JSON requires: time, src, dst, protocol, info. TShark JSON output is detected and normalized automatically. Optional normalized fields: length, srcNode, dstNode, step, explain, fields.</p>
           <pre className="overflow-x-auto rounded bg-background/60 p-3 font-mono text-xs">{EXAMPLE}</pre>
         </section>
       </div>
