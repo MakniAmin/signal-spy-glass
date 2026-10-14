@@ -83,7 +83,6 @@ function protocolFields(layers: JsonObject): Record<string, unknown> {
   for (const [layerName, layerValue] of Object.entries(layers)) {
     if (layerName === "frame" || layerName.startsWith("_ws.col")) continue;
     if (layerName === "ip" || layerName === "ipv6" || layerName === "eth" || layerName === "sll" || layerName === "sll2") continue;
-    if (layerName === "tcp" || layerName === "udp" || layerName === "sctp" || layerName === "icmp" || layerName === "icmpv6") continue;
     result[layerName] = toFieldValue(layerValue);
   }
   return result;
