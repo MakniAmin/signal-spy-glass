@@ -33,6 +33,12 @@ export function PacketTable({ packets, selectedId, onSelect }: { packets: Packet
         <tbody ref={ref}>
           {packets.map((p) => {
             const sel = p.id === selectedId;
+            const lengthLabel = p.demo ? `≈${p.length}` : p.length > 0 ? String(p.length) : "—";
+            const lengthTitle = p.demo
+              ? "Illustrative value generated for teaching data, not a measured frame length."
+              : p.length > 0
+                ? "Frame length from the imported record."
+                : "No frame length was provided by the imported record.";
             return (
               <tr
                 key={p.id}
@@ -52,14 +58,14 @@ export function PacketTable({ packets, selectedId, onSelect }: { packets: Packet
                 <td className="whitespace-nowrap px-2 py-1">{p.src}</td>
                 <td className="whitespace-nowrap px-2 py-1">{p.dst}</td>
                 <td className="px-2 py-1"><ProtoTag p={p.protocol} /></td>
-                <td className="px-2 py-1" title={p.demo ? "Illustrative value generated for teaching data, not a measured frame length." : "Frame length from the imported record."}>{p.demo ? `≈${p.length}` : p.length}</td>
+                <td className="px-2 py-1" title={lengthTitle}>{lengthLabel}</td>
                 <td className="min-w-[18rem] px-2 py-1">{p.info}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <p className="border-t border-border px-2 py-1.5 text-[10px] text-muted-foreground">* Demo packet lengths are illustrative estimates; imported lengths are shown as provided by the source data.</p>
+      <p className="border-t border-border px-2 py-1.5 text-[10px] text-muted-foreground">* Demo packet lengths are illustrative estimates; imported lengths are shown only when supplied by the source data.</p>
     </div>
   );
 }
